@@ -1,0 +1,13 @@
+#!/command/with-contenv bashio
+# vim: ft=bash
+# shellcheck shell=bash
+# ==============================================================================
+# Start the Leokani Wyoming server
+# ==============================================================================
+flags=(--port 10200 --speed "$(bashio::config 'speed')")
+
+if bashio::config.true 'debug_logging'; then
+    flags+=(--debug)
+fi
+
+exec python3 -m leokani_server wyoming "${flags[@]}"

@@ -1,0 +1,17 @@
+---
+configuration:
+  speed:
+    name: Speed
+    description: >-
+      Speaking rate, from 0.5 to 2.0. 1.0 is normal.
+  openai_api_key:
+    name: API key
+    description: >-
+      Key the OpenAI-compatible speech API asks for. Leave empty for none.
+  debug_logging:
+    name: Debug logging
+    description: >-
+      Log every request.
+network:
+  10200/tcp: Wyoming (Home Assistant)
+  8880/tcp: OpenAI-compatible speech API

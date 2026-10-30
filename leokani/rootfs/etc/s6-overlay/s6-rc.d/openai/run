@@ -1,0 +1,27 @@
+#!/command/with-contenv bashio
+# vim: ft=bash
+# shellcheck shell=bash
+# ==============================================================================
+# Start the OpenAI-compatible speech API, only if its port is published
+# (Configuration > Network). Otherwise idle, so it costs no memory.
+# ==============================================================================
+if ! bashio::var.has_value "$(bashio::addon.port 8880)"; then
+    exec sleep infinity
+fi
+
+flags=(--port 8880)
+
+if bashio::config.true 'debug_logging'; then
+    flags+=(--debug)
+fi
+
+if bashio::config.has_value 'openai_api_key'; then
+    LEOKANI_API_KEY="$(bashio::config 'openai_api_key')"
+    export LEOKANI_API_KEY
+fi
+
+# Its own state file, so the health check keeps checking the Wyoming server.
+export TMPDIR=/tmp/openai
+mkdir -p "${TMPDIR}"
+
+exec python3 -m leokani_server openai "${flags[@]}"
