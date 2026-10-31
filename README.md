@@ -6,9 +6,10 @@ from [Milliwatt Labs](https://milliwattlabs.com), as a Home Assistant app. Runs 
 
 ## Install
 
-1. In Home Assistant, go to **Settings > Apps > App store**, open the **⋮** menu and choose **Repositories**.
-2. Add `https://github.com/Milliwatt-Labs/home-assistant-addons` and close the dialog.
-3. Find **Leokani** in the store, install it and start it.
+1. In Home Assistant, go to **Settings > Apps** and choose **Install app**. Open the **⋮** menu and choose
+   **Repositories**.
+2. Choose **Add**, paste `https://github.com/Milliwatt-Labs/home-assistant-addons` and choose **Add**.
+3. Back in the store, find **Leokani**, install it and start it.
 
 Then follow the app's **Documentation** tab: Home Assistant finds Leokani by itself.
 

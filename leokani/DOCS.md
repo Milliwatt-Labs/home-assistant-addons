@@ -6,8 +6,8 @@ hear leaves your network.
 ## Set up
 
 1. Install Leokani and start it.
-2. Go to **Settings > Devices & services**. Under **Discovered**, find **Leokani** and select **Add**.
-3. Go to **Settings > Voice assistants**, open your assistant, and choose **Leokani** under **Text-to-speech**.
+2. Go to **Settings > Devices & services**. Under **Discovered**, choose **Add** on **Leokani**, then **Submit**.
+3. Go to **Settings > Voice assistants**, open your assistant, and choose **leokani** under **Text-to-speech**.
 
 ## Try it
 
