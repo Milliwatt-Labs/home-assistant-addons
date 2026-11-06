@@ -1,0 +1,32 @@
+#!/command/with-contenv bashio
+# vim: ft=bash
+# shellcheck shell=bash
+# ==============================================================================
+# After a Model change, clear Home Assistant's text-to-speech cache once, so it
+# doesn't keep playing phrases it saved in the previous voice. Then idle.
+# ==============================================================================
+readonly last_file=/data/last-model
+model="$(bashio::config 'model' 'Leokani-tts 7M')"
+last="Leokani-tts 7M"                       # 1.1 had only the 7M
+[[ -s "${last_file}" ]] && last="$(<"${last_file}")"
+
+if [[ "${model}" != "${last}" ]]; then
+    # Wait for Leokani, then for Home Assistant (it may still be starting).
+    bash -c "until (exec 3<> /dev/tcp/localhost/10200); do sleep 0.5; done" > /dev/null 2>&1 || true
+    for _ in $(seq 1 120); do
+        if curl -sf -m 30 -X POST -H "Authorization: Bearer ${SUPERVISOR_TOKEN}" \
+            -H "Content-Type: application/json" -d '{}' \
+            http://supervisor/core/api/services/tts/clear_cache > /dev/null; then
+            bashio::log.info "Model is now ${model}: cleared Home Assistant's text-to-speech cache."
+            echo "${model}" > "${last_file}"
+            break
+        fi
+        sleep 5
+    done
+    [[ "$(cat "${last_file}" 2> /dev/null)" == "${model}" ]] \
+        || bashio::log.warning "Could not clear Home Assistant's text-to-speech cache; trying again at the next start."
+elif [[ ! -s "${last_file}" ]]; then
+    echo "${model}" > "${last_file}"
+fi
+
+exec sleep infinity

@@ -1,5 +1,5 @@
 ---
-version: 1.2.0
+version: 1.2.1
 slug: leokani
 name: Leokani
 description: Text to speech with Leokani-tts
@@ -10,6 +10,7 @@ arch:
 init: false
 discovery:
   - wyoming
+homeassistant_api: true
 options:
   model: Leokani-tts 7M
   speed: 1.0
