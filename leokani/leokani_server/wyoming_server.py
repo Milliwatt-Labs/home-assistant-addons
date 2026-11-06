@@ -1,6 +1,6 @@
 """Wyoming text-to-speech server for Home Assistant, following wyoming-piper's event flow.
 
-describe -> info (one voice, en_US). synthesize -> audio-start, audio-chunk..., audio-stop, sent clause by clause
+describe -> info (one voice, en_US, described by the model in use). synthesize -> audio-start, audio-chunk..., audio-stop, sent clause by clause
 as each one is rendered. Streaming text (synthesize-start, synthesize-chunk..., synthesize-stop) renders each clause
 as soon as it is complete and ends with synthesize-stopped.
 """
@@ -27,11 +27,12 @@ log = logging.getLogger("leokani.wyoming")
 WIDTH, CHANNELS = 2, 1
 
 
-def make_info() -> Info:
+def make_info(model_name: str = "Leokani-tts 7M", model_version: str = VERSION) -> Info:
+    """The voice id stays "leokani" whichever model speaks, so a pipeline set to it keeps working after a switch."""
     attribution = Attribution(name="Milliwatt Labs", url="https://milliwattlabs.com")
-    voice = TtsVoice(name=VOICE, description="Leokani (English, US)", attribution=attribution, installed=True,
-                     version=VERSION, languages=["en_US"])
-    program = TtsProgram(name="leokani", description="Leokani", attribution=attribution, installed=True,
+    voice = TtsVoice(name=VOICE, description=f"{model_name} (English, US)", attribution=attribution, installed=True,
+                     version=model_version, languages=["en_US"])
+    program = TtsProgram(name="leokani", description=model_name, attribution=attribution, installed=True,
                          version=VERSION, voices=[voice], supports_synthesize_streaming=True)
     return Info(tts=[program])
 
@@ -108,11 +109,11 @@ class LeokaniHandler(AsyncEventHandler):
 
 async def run(engine: Engine, uri: str, speed: float, samples_per_chunk: int, zeroconf: str | None,
               zeroconf_host: str | None = None):
-    info = make_info()
+    info = make_info(engine.model_name, engine.model_version)
     server = AsyncServer.from_uri(uri)
     if zeroconf is not None:
         await advertise(uri, zeroconf, zeroconf_host)
-    log.info("Wyoming server on %s", uri)
+    log.info("Wyoming server on %s (%s)", uri, engine.model_name)
     await server.run(partial(LeokaniHandler, info, engine, speed, samples_per_chunk))
 
 

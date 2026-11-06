@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import importlib.util
+import json
 import logging
 import os
 import re
@@ -25,6 +26,8 @@ MODEL_FILE = "leokani-tts-fp16.onnx"
 VOICE = "leokani"
 VERSION = "1.1"
 SPEED_MIN, SPEED_MAX = 0.5, 2.0
+# Public names of the released voices, by config.json "name".
+MODEL_NAMES = {"leokani-tts": "Leokani-tts 7M", "leokani-tts-4.5M": "Leokani-tts 4.5M"}
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _MARKS = str.maketrans({c: " " for c in "*_`#>|"})      # leokani_onnx.clean's marks, one for one
@@ -37,6 +40,17 @@ def default_model_dir() -> str:
             return os.path.abspath(d)
     raise SystemExit("model not found: set LEOKANI_MODEL_DIR to a directory with leokani_onnx.py, config.json "
                      f"and {MODEL_FILE}")
+
+
+def model_info(model_dir: str) -> tuple[str, str]:
+    """(public name, version) of the voice in model_dir, from its config.json."""
+    try:
+        with open(os.path.join(model_dir, "config.json"), encoding="utf-8") as f:
+            cfg = json.load(f)
+    except (OSError, ValueError):
+        cfg = {}
+    name = str(cfg.get("name") or "leokani-tts")
+    return MODEL_NAMES.get(name, name), str(cfg.get("version") or VERSION)
 
 
 def load_reference(model_dir: str):
@@ -123,6 +137,7 @@ class Engine:
     def __init__(self, model_dir: str | None = None, espeak_lib: str | None = None, threads: int = 0, jobs: int = 2):
         self.model_dir = model_dir or default_model_dir()
         self.ref = load_reference(self.model_dir)
+        self.model_name, self.model_version = model_info(self.model_dir)
         lib = espeak_lib or os.environ.get("LEOKANI_ESPEAK_LIB")
         t0 = time.perf_counter()
         self.threads = threads or default_threads()
@@ -132,8 +147,8 @@ class Engine:
         self.pool = ThreadPoolExecutor(max_workers=max(1, jobs), thread_name_prefix="leokani")
         self.espeak_version = self.tts.espeak().version()
         self.render_chunk("Hello there.", 1.0)              # warm up, so the first request isn't the slow one
-        log.info("voice ready in %.0f ms (%s, %s, %d threads)", (time.perf_counter() - t0) * 1000, MODEL_FILE,
-                 self.espeak_version, self.threads)
+        log.info("voice ready in %.0f ms (%s %s, %s, %s, %d threads)", (time.perf_counter() - t0) * 1000,
+                 self.model_name, self.model_version, MODEL_FILE, self.espeak_version, self.threads)
 
     # -------------------------------------------------------------------------------------------- blocking
 

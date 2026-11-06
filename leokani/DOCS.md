@@ -26,6 +26,7 @@ data:
 
 | Option | |
 |---|---|
+| Model | Leokani-tts 7M (the default) or Leokani-tts 4.5M, a smaller voice. |
 | Speed | Speaking rate, from 0.5 to 2.0. 1.0 is normal. |
 | API key | Key the OpenAI-compatible speech API asks for. Empty: no key. |
 | Debug logging | Log every request. |
@@ -68,7 +69,8 @@ recognize audio it generated. The mark is the same in all audio and contains no 
 
 ## Licenses
 
-- **The voice**, [Leokani-tts 7M](https://huggingface.co/milliwattlabs/leokani-tts-7M), is
+- **The voices**, [Leokani-tts 7M](https://huggingface.co/milliwattlabs/leokani-tts-7M) and
+  [Leokani-tts 4.5M](https://huggingface.co/milliwattlabs/leokani-tts-4.5M), are
   [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/): free for non-commercial use. For a commercial
   license or a custom voice, email [hello@milliwattlabs.com](mailto:hello@milliwattlabs.com).
 - **espeak-ng**, which turns text into phonemes, is GPL-3.0. Its source is at

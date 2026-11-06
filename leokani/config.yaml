@@ -1,8 +1,8 @@
 ---
-version: 1.1.0
+version: 1.2.0
 slug: leokani
 name: Leokani
-description: Text to speech with Leokani-tts 7M
+description: Text to speech with Leokani-tts
 url: https://github.com/Milliwatt-Labs/home-assistant-addons/tree/main/leokani
 arch:
   - amd64
@@ -11,9 +11,11 @@ init: false
 discovery:
   - wyoming
 options:
+  model: Leokani-tts 7M
   speed: 1.0
   debug_logging: false
 schema:
+  model: list(Leokani-tts 7M|Leokani-tts 4.5M)
   speed: float(0.5,2.0)
   openai_api_key: password?
   debug_logging: bool

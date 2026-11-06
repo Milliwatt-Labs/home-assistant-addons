@@ -1,5 +1,7 @@
 ---
 configuration:
+  model:
+    name: Model
   speed:
     name: Speed
     description: >-

@@ -22,12 +22,19 @@ ADD --checksum=sha256:bb4b6392670c5d3f93876996fcaa19858a4a413a0c7720144c18b0d6f1
     /python.tar.gz
 FROM python-${TARGETARCH} AS python-download
 
-# The Leokani-tts 7M voice (CC BY-NC 4.0), pinned to a Hugging Face commit.
+# The Leokani-tts voices (CC BY-NC 4.0), each pinned to a Hugging Face commit. The app's model option picks one.
 FROM scratch AS model
 ARG HF=https://huggingface.co/milliwattlabs/leokani-tts-7M/resolve/7c490eed4e14f5c6ff42bbf943956c788feca2a8
 ADD --checksum=sha256:cb852e09b0341d58608e858cfaed5c53275bd4277baa1bf8e6dad4c20efcef0d ${HF}/leokani-tts-fp16.onnx /
 ADD --checksum=sha256:9457d15f82bb7f183b56ae96c62daa4635d03e7122a11d623f06a7681a387cff ${HF}/config.json /
 ADD --checksum=sha256:ce4578108c9d71098635677f94db48963b4535bdf0afb2fac6245cc1a7328c76 ${HF}/leokani_onnx.py /
+ADD --checksum=sha256:41003d4a74749c0220e33dd415042164b5a1093ed401f36277234f772d22d3d0 ${HF}/LICENSE /
+
+FROM scratch AS model-4.5m
+ARG HF=https://huggingface.co/milliwattlabs/leokani-tts-4.5M/resolve/28d74ad49297e994568dd85791101344e51550ce
+ADD --checksum=sha256:fd222d921690e4261dd296a4e4fa08c91cd099621c4ac93aac8b2389379e4ec7 ${HF}/leokani-tts-fp16.onnx /
+ADD --checksum=sha256:23c01c6783131ff6e8568b1d23c18481dfe8ddf174d956e78bbc1ec26976c8ae ${HF}/config.json /
+ADD --checksum=sha256:16c418e3316f52029fc58195a83f06bc297a4b99f890a6d5ab273d9cb50cf950 ${HF}/leokani_onnx.py /
 ADD --checksum=sha256:41003d4a74749c0220e33dd415042164b5a1093ed401f36277234f772d22d3d0 ${HF}/LICENSE /
 
 # ---------------------------------------------------------------------------------------- espeak-ng library
@@ -80,6 +87,7 @@ COPY --from=espeak /out/lib/libespeak-ng.so.1 /opt/leokani/espeak/lib/
 COPY --from=espeak /out/share/ /usr/share/doc/espeak-ng/
 COPY espeak-ng-data/ /opt/leokani/espeak/espeak-ng-data/
 COPY --from=model / /opt/leokani/model/
+COPY --from=model-4.5m / /opt/leokani/model-4.5M/
 COPY leokani_server/ /opt/leokani/app/leokani_server/
 COPY rootfs /
 ENV PATH=/opt/leokani/python/bin:$PATH \
@@ -91,7 +99,7 @@ ENV PATH=/opt/leokani/python/bin:$PATH \
     ESPEAK_DATA_PATH=/opt/leokani/espeak
 LABEL org.opencontainers.image.title="Leokani" \
       org.opencontainers.image.source="https://github.com/Milliwatt-Labs/home-assistant-addons" \
-      org.opencontainers.image.description="Leokani-tts 7M text to speech for Home Assistant" \
+      org.opencontainers.image.description="Leokani-tts text to speech for Home Assistant" \
       org.opencontainers.image.vendor="Milliwatt Labs" \
       org.opencontainers.image.licenses="MIT AND CC-BY-NC-4.0 AND GPL-3.0-or-later"
 

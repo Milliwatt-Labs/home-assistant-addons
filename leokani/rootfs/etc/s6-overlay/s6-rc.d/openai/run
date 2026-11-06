@@ -5,11 +5,20 @@
 # Start the OpenAI-compatible speech API, only if its port is published
 # (Configuration > Network). Otherwise idle, so it costs no memory.
 # ==============================================================================
+
+# The voice the Model option picks (Leokani-tts 7M when unset, as in 1.1).
+model_dir() {
+    case "$(bashio::config 'model' 'Leokani-tts 7M')" in
+        "Leokani-tts 4.5M") echo /opt/leokani/model-4.5M ;;
+        *) echo /opt/leokani/model ;;
+    esac
+}
+
 if ! bashio::var.has_value "$(bashio::addon.port 8880)"; then
     exec sleep infinity
 fi
 
-flags=(--port 8880)
+flags=(--port 8880 --model-dir "$(model_dir)")
 
 if bashio::config.true 'debug_logging'; then
     flags+=(--debug)
